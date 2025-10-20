@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>感冒药信息指南</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+
+        :root {
+            --primary-dark: #1a3a5f;
+            --primary-medium: #2c5282;
+            --primary-light: #4a7bbd;
+            --accent-teal: #0d9488;
+            --accent-orange: #ea580c;
+            --accent-red: #dc2626;
+            --text-dark: #1e293b;
+            --text-medium: #475569;
+            --text-light: #64748b;
+            --background-light: rgba(255, 255, 255, 0.7);
+            --background-medium: rgba(255, 255, 255, 0.5);
+            --background-dark: rgba(255, 255, 255, 0.3);
+            --white: #ffffff;
+            --warning: #dc2626;
+            --success: #059669;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary-medium) 0%, var(--primary-light) 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 25px;
+            background: var(--background-medium);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        h1 {
+            color: var(--primary-dark);
+            text-shadow: 0 2px 4px rgba(255, 255, 255, 0.5);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: var(--text-medium);
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .category-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .category-btn {
+            padding: 12px 25px;
+            background: var(--background-dark);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: var(--primary-dark);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .category-btn:hover, .category-btn.active {
+            background: var(--accent-teal);
+            color: var(--white);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background: var(--background-light);
+            backdrop-filter: blur(12px);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .medicine-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-red);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .medicine-type {
+            background: var(--accent-teal);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: var(--white);
+            font-weight: 600;
+        }
+
+        .symptoms {
+            margin-bottom: 15px;
+        }
+
+        .symptoms-title, .notes-title {
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            font-size: 1.1rem;
+        }
+
+        .symptoms-title::before {
+            content: "🤒";
+            margin-right: 8px;
+            font-size: 1.2rem;
+        }
+
+        .notes-title::before {
+            content: "⚠️";
+            margin-right: 8px;
+            font-size: 1.2rem;
+        }
+
+        .symptoms-list, .notes-list {
+            color: var(--text-medium);
+            padding-left: 20px;
+            line-height: 1.6;
+        }
+
+        .symptoms-list li, .notes-list li {
+            margin-bottom: 5px;
+        }
+
+        .notes {
+            background: var(--background-medium);
+            padding: 15px;
+            border-radius: 12px;
+            border-left: 4px solid var(--accent-orange);
+        }
+
+        .warning {
+            color: var(--warning);
+            font-weight: 600;
+        }
+
+        .highlight {
+            color: var(--accent-teal);
+            font-weight: 600;
+        }
+
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            padding: 20px;
+            background: var(--background-dark);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .cards-container {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .category-btn {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>感冒药信息指南</h1>
+            <p class="subtitle">本页面提供常见感冒药的详细信息，包括对应症状和注意事项。请根据自身情况谨慎选择，必要时咨询医生或药师。</p>
+        </header>
+
+        <div class="category-container">
+            <button class="category-btn active">全部药物</button>
+            <button class="category-btn">解热镇痛类</button>
+            <button class="category-btn">缓解鼻部症状</button>
+            <button class="category-btn">缓解咳嗽类</button>
+            <button class="category-btn">复方感冒药</button>
+            <button class="category-btn">抗病毒药</button>
+            <button class="category-btn">中成药</button>
+        </div>
+
+        <div class="cards-container">
+            <!-- 解热镇痛类 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="medicine-name">对乙酰氨基酚</div>
+                    <div class="medicine-type">解热镇痛类</div>
+                </div>
+                <div class="symptoms">
+                    <div class="symptoms-title">对应症状</div>
+                    <ul class="symptoms-list">
+                        <li>发烧</li>
+                        <li>头痛</li>
+                        <li>关节痛、肌肉痛</li>
+                    </ul>
+                </div>
+                <div class="notes">
+                    <div class="notes-title">注意事项</div>
+                    <ul class="notes-list">
+                        <li><span class="warning">严禁</span>与多种复方感冒药同服，以免过量导致肝损伤</li>
+                        <li>每日最大剂量不超过2克</li>
+                        <li>肝功能不全者慎用</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="medicine-name">布洛芬</div>
+                    <div class="medicine-type">解热镇痛类</div>
+                </div>
+                <div class="symptoms">
+                    <div class="symptoms-title">对应症状</div>
+                    <ul class="symptoms-list">
+                        <li>发烧</li>
+                        <li>头痛、牙痛</li>
+                        <li>肌肉痛、痛经</li>
+                    </ul>
+                </div>
+                <div class="notes">
+                    <div class="notes-title">注意事项</div>
+                    <ul class="notes-list">
+                        <li>胃肠道刺激较大，建议饭后服用</li>
+                        <li>消化道溃疡患者慎用</li>
+                        <li>与阿司匹林可能存在交叉过敏</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 缓解鼻部症状类 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="medicine-name">马来酸氯苯那敏（扑尔敏）</div>
+                    <div class="medicine-type">缓解鼻部症状</div>
+                </div>
+                <div class="symptoms">
+                    <div class="symptoms-title">对应症状</div>
+                    <ul class="symptoms-list">
+                        <li>打喷嚏</li>
+                        <li>流清涕</li>
+                        <li>过敏性鼻炎</li>
+                    </ul>
+                </div>
+                <div class="notes">
+                    <div class="notes-title">注意事项</div>
+                    <ul class="notes-list">
+                        <li><span class="warning">有明显嗜睡副作用</span></li>
+                        <li>服药后应避免驾驶、操作机械或高空作业</li>
+                        <li>青光眼、前列腺肥大患者慎用</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="medicine-name">氯雷他定</div>
+                    <div class="medicine-type">缓解鼻部症状</div>
+                </div>
+                <div class="symptoms">
+                    <div class="symptoms-title">对应症状</div>
+                    <ul class="symptoms-list">
+                        <li>过敏性鼻炎</li>
+                        <li>打喷嚏、流鼻涕</li>
+                        <li>慢性荨麻疹</li>
+                    </ul>
+                </div>
+                <div class="notes">
+                    <div class="notes-title">注意事项</div>
+                    <ul class="notes-list">
+                        <li>嗜睡副作用较轻，但部分人仍会出现</li>
+                        <li>严重肝功能不全者需调整剂量</li>
+                        <li>与酮康唑、红霉素等药物合用需谨慎</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="medicine-name">盐酸伪麻黄碱</div>
+                    <div class="medicine-type">缓解鼻部症状</div>
+                </div>
+                <div class="symptoms">
+                    <div class="symptoms-title">对应症状</div>
+                    <ul class="symptoms-list">
+                        <li>缓解鼻塞</li>
+                        <li>鼻黏膜充血</li>
+                    </ul>
+                </div>
+                <div class="notes">
+                    <div class="notes-title">注意事项</div>
+                    <ul class="notes-list">
+                        <li>可能导致心率加快、血压升高</li>
+                        <li><span class="warning">高血压、心脏病、青光眼患者慎用</span></li>
+                        <li>需在医生指导下使用</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 缓解咳嗽类 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="medicine-name">氢溴酸右美沙芬</div>
+                    <div class="medicine-type">缓解咳嗽类</div>
+                </div>
+                <div class="symptoms">
+                    <div class="symptoms-title">对应症状</div>
+                    <ul class="symptoms-list">
+                        <li>无痰的干咳</li>
+                    </ul>
+                </div>
+                <div class="notes">
+                    <div class="notes-title">注意事项</div>
+                    <ul class="notes-list">
+                        <li><span class="warning">痰多患者禁用</span>，因为会阻碍痰液排出</li>
+                        <li>妊娠3个月内妇女禁用</li>
+                        <li>与单胺氧化酶抑制剂合用需谨慎</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="medicine-name">氨溴索</div>
+                    <div class="medicine-type">缓解咳嗽类</div>
+                </div>
+                <div class="symptoms">
+                    <div class="symptoms-title">对应症状</div>
+                    <ul class="symptoms-list">
+                        <li>有痰不易咳出</li>
+                        <li>急慢性支气管炎</li>
+                    </ul>
+                </div>
+                <div class="notes">
+                    <div class="notes-title">注意事项</div>
+                    <ul class="notes-list">
+                        <li>是祛痰药，帮助稀释痰液，使其易于咳出，而非镇咳</li>
+                        <li>妊娠初期(前3个月)慎用</li>
+                        <li>与抗生素同时使用可增加其在肺组织的浓度</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 复方感冒药 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="medicine-name">泰诺（酚麻美敏片）</div>
+                    <div class="medicine-type">复方感冒药</div>
+                </div>
+                <div class="symptoms">
+                    <div class="symptoms-title">对应症状</div>
+                    <ul class="symptoms-list">
+                        <li>发热、头痛、四肢酸痛</li>
+                        <li>打喷嚏、流鼻涕</li>
+                        <li>咳嗽</li>
+                    </ul>
+                </div>
+                <div class="notes">
+                    <div class="notes-title">注意事项</div>
+                    <ul class="notes-list">
+                        <li>成分含【对乙酰氨基酚+伪麻黄碱+右美沙芬+氯苯那敏】</li>
+                        <li><span class="warning">切勿再单独服用其他含"对乙酰氨基酚"的药</span></li>
+                        <li>服药期间避免饮酒</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="medicine-name">999感冒灵颗粒</div>
+                    <div class="medicine-type">复方感冒药</div>
+                </div>
+                <div class="symptoms">
+                    <div class="symptoms-title">对应症状</div>
+                    <ul class="symptoms-list">
+                        <li>发热、头痛</li>
+                        <li>鼻塞、流涕</li>
+                        <li>咽痛</li>
+                    </ul>
+                </div>
+                <div class="notes">
+                    <div class="notes-title">注意事项</div>
+                    <ul class="notes-list">
+                        <li>为中西药复方，含【对乙酰氨基酚、咖啡因、马来酸氯苯那敏】等</li>
+                        <li>同样需避免成分重复使用</li>
+                        <li>服药期间避免驾驶、高空作业</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 抗病毒药 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="medicine-name">奥司他韦</div>
+                    <div class="medicine-type">抗病毒药</div>
+                </div>
+                <div class="symptoms">
+                    <div class="symptoms-title">对应症状</div>
+                    <ul class="symptoms-list">
+                        <li>流感引起的发烧、头痛</li>
+                        <li>肌肉酸痛、全身不适</li>
+                    </ul>
+                </div>
+                <div class="notes">
+                    <div class="notes-title">注意事项</div>
+                    <ul class="notes-list">
+                        <li><span class="warning">处方药</span>，需医生确诊后方可使用</li>
+                        <li>在症状出现<span class="warning">48小时内</span>开始服用效果最好</li>
+                        <li>常见副作用包括恶心、呕吐，可与食物同服减轻</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 中成药 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="medicine-name">连花清瘟胶囊/颗粒</div>
+                    <div class="medicine-type">中成药</div>
+                </div>
+                <div class="symptoms">
+                    <div class="symptoms-title">对应症状</div>
+                    <ul class="symptoms-list">
+                        <li>发烧或高热</li>
+                        <li>肌肉酸痛</li>
+                        <li>咽痛、舌偏红</li>
+                    </ul>
+                </div>
+                <div class="notes">
+                    <div class="notes-title">注意事项</div>
+                    <ul class="notes-list">
+                        <li>适用于<span class="highlight">风热感冒</span></li>
+                        <li>风寒感冒（怕冷重、流清涕）者不适用</li>
+                        <li>高血压、心脏病患者慎用</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="medicine-name">感冒清热颗粒</div>
+                    <div class="medicine-type">中成药</div>
+                </div>
+                <div class="symptoms">
+                    <div class="symptoms-title">对应症状</div>
+                    <ul class="symptoms-list">
+                        <li>怕冷、流清涕</li>
+                        <li>头痛发热</li>
+                        <li>咳嗽咽干</li>
+                    </ul>
+                </div>
+                <div class="notes">
+                    <div class="notes-title">注意事项</div>
+                    <ul class="notes-list">
+                        <li>适用于<span class="highlight">风寒感冒</span></li>
+                        <li>风热感冒者不适用</li>
+                        <li>不宜在服药期间同时服用滋补性中成药</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="medicine-name">小柴胡颗粒</div>
+                    <div class="medicine-type">中成药</div>
+                </div>
+                <div class="symptoms">
+                    <div class="symptoms-title">对应症状</div>
+                    <ul class="symptoms-list">
+                        <li>寒热往来（忽冷忽热）</li>
+                        <li>胸胁苦满</li>
+                        <li>食欲不振、心烦喜呕</li>
+                    </ul>
+                </div>
+                <div class="notes">
+                    <div class="notes-title">注意事项</div>
+                    <ul class="notes-list">
+                        <li>适用于少阳证感冒</li>
+                        <li>高血压、心脏病、肝病、糖尿病患者慎用</li>
+                        <li>服药期间忌食生冷、辛辣、油腻食物</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>温馨提示：以上信息仅供参考，不能替代专业医疗建议。用药前请咨询医生或药师，并仔细阅读药品说明书。</p>
+            <p>如有严重症状或用药后不适，请立即就医。</p>
+        </footer>
+    </div>
+
+    <script>
+        // 简单的分类筛选功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const categoryButtons = document.querySelectorAll('.category-btn');
+            const cards = document.querySelectorAll('.card');
+            
+            categoryButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // 移除所有按钮的active类
+                    categoryButtons.forEach(btn => btn.classList.remove('active'));
+                    // 为当前点击的按钮添加active类
+                    this.classList.add('active');
+                    
+                    const category = this.textContent;
+                    
+                    // 显示或隐藏卡片
+                    cards.forEach(card => {
+                        if (category === '全部药物') {
+                            card.style.display = 'block';
+                        } else {
+                            const cardType = card.querySelector('.medicine-type').textContent;
+                            if (cardType === category) {
+                                card.style.display = 'block';
+                            } else {
+                                card.style.display = 'none';
+                            }
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>
